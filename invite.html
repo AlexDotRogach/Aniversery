@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Эвелина, у меня для тебя дело</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream: #FFF7E8;
+    --coral: #FF6F59;
+    --coral-dark: #E85A45;
+    --teal: #06A77D;
+    --sun: #FFC145;
+    --ink: #2B2250;
+    --ink-soft: #554B7A;
+    --card: #FFFFFF;
+    --line: rgba(43,34,80,0.12);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Quicksand', sans-serif;
+    overflow-x:hidden;
+    background-image:
+      radial-gradient(circle at 8% 15%, rgba(255,193,69,0.25) 0, transparent 40%),
+      radial-gradient(circle at 92% 80%, rgba(6,167,125,0.18) 0, transparent 40%);
+  }
+  h1,h2,h3,.display{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    margin:0;
+  }
+  .wrap{
+    max-width:720px;
+    margin:0 auto;
+    padding:0 24px;
+  }
+
+  /* ---------- floating doodles ---------- */
+  .doodle{
+    position:absolute;
+    font-size:28px;
+    opacity:0.55;
+    animation:float 6s ease-in-out infinite;
+    pointer-events:none;
+    user-select:none;
+  }
+  @keyframes float{
+    0%,100%{transform:translateY(0) rotate(-4deg);}
+    50%{transform:translateY(-16px) rotate(6deg);}
+  }
+
+  /* ---------- HERO / ENVELOPE ---------- */
+  .hero{
+    min-height:100svh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    position:relative;
+    padding:40px 24px;
+  }
+  .eyebrow{
+    display:inline-block;
+    background:var(--ink);
+    color:var(--cream);
+    font-family:'Baloo 2',sans-serif;
+    font-size:13px;
+    letter-spacing:0.08em;
+    padding:7px 18px;
+    border-radius:100px;
+    margin-bottom:22px;
+    transform:rotate(-2deg);
+  }
+  .envelope-stage{
+    perspective:1200px;
+    cursor:pointer;
+  }
+  .envelope{
+    width:260px;
+    height:180px;
+    position:relative;
+    transition:transform .5s cubic-bezier(.2,.9,.3,1.3);
+  }
+  .envelope:hover{ transform:translateY(-6px) rotate(-1deg); }
+  .env-body{
+    position:absolute; inset:0;
+    background:var(--card);
+    border-radius:14px;
+    border:3px solid var(--ink);
+    box-shadow:6px 6px 0 var(--ink);
+  }
+  .env-flap{
+    position:absolute;
+    top:-3px; left:-3px; right:-3px;
+    height:110px;
+    background:var(--coral);
+    border:3px solid var(--ink);
+    border-bottom:none;
+    clip-path:polygon(0 0, 50% 62%, 100% 0);
+    border-radius:14px 14px 0 0;
+    transform-origin:top;
+    backface-visibility:hidden;
+    transition:transform .5s cubic-bezier(.3,1,.4,1), opacity .25s ease .35s;
+    z-index:2;
+  }
+  .env-seal{
+    position:absolute;
+    top:52%; left:50%;
+    width:52px;height:52px;
+    background:var(--sun);
+    border:3px solid var(--ink);
+    border-radius:50%;
+    transform:translate(-50%,-50%);
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px;
+    z-index:3;
+    box-shadow:0 3px 0 rgba(0,0,0,0.15);
+    transition:opacity .2s ease;
+  }
+  .envelope.opened .env-flap{ transform:rotateX(180deg); opacity:0; pointer-events:none; }
+  .envelope.opened .env-seal{ opacity:0; }
+  .hint-tap{
+    margin-top:18px;
+    font-size:14px;
+    color:var(--ink-soft);
+    font-weight:600;
+    transition:opacity .3s;
+  }
+  .hint-tap.hidden{ opacity:0; height:0; margin:0; overflow:hidden; }
+
+  /* ---------- reveal + continue ---------- */
+  .reveal-box{
+    margin-top:26px;
+    max-width:280px;
+    background:#fff;
+    border:3px solid var(--ink);
+    border-radius:14px;
+    padding:0 18px;
+    font-size:14px;
+    line-height:1.5;
+    color:var(--ink-soft);
+    font-weight:600;
+    max-height:0;
+    opacity:0;
+    overflow:hidden;
+    transition:max-height .5s ease, opacity .4s ease, padding .5s ease, margin .5s ease;
+  }
+  .reveal-box.show{
+    max-height:220px;
+    opacity:1;
+    padding:16px 18px;
+    margin-top:26px;
+  }
+  .continue-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    margin-top:14px;
+    background:var(--sun);
+    border:3px solid var(--ink);
+    border-radius:100px;
+    padding:10px 20px;
+    font-family:'Baloo 2',sans-serif;
+    font-weight:700;
+    font-size:14px;
+    color:var(--ink);
+    cursor:pointer;
+    box-shadow:4px 4px 0 var(--ink);
+    transition:transform .15s;
+  }
+  .continue-btn:hover{ transform:translateY(-2px); }
+  .bounce-arrow{ animation:bounceY 1.2s ease-in-out infinite; }
+  @keyframes bounceY{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(4px);} }
+
+  section{
+    padding:70px 0;
+    position:relative;
+  }
+
+  /* ---------- MESSAGE ---------- */
+  .msg-card{
+    background:var(--card);
+    border:3px solid var(--ink);
+    border-radius:22px;
+    padding:36px 30px;
+    box-shadow:8px 8px 0 var(--ink);
+    text-align:center;
+  }
+  .msg-card h2{ font-size:clamp(26px,5vw,34px); color:var(--coral-dark); margin-bottom:14px;}
+  .msg-card p{ font-size:17px; line-height:1.6; color:var(--ink-soft); margin:0 0 10px;}
+  .signature{
+    margin-top:18px;
+    font-family:'Baloo 2',sans-serif;
+    font-size:20px;
+    color:var(--ink);
+  }
+
+  /* ---------- COUNTDOWN ---------- */
+  .countdown-wrap{ text-align:center; }
+  .countdown-wrap h3{ font-size:26px; margin-bottom:8px; margin-top: 16px}
+  .countdown-sub{ color:var(--ink-soft); margin-bottom:26px; font-weight:600;}
+  .countdown{
+    display:flex;
+    gap:14px;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
+  .cd-box{
+    background:var(--ink);
+    color:var(--cream);
+    border-radius:16px;
+    width:78px;
+    padding:14px 0;
+    box-shadow:5px 5px 0 var(--coral);
+  }
+  .cd-num{ font-family:'Baloo 2',sans-serif; font-size:30px; font-weight:800; }
+  .cd-label{ font-size:11px; letter-spacing:.06em; opacity:.85; margin-top:2px;}
+  .mystery-time{
+    margin-top:22px;
+    display:inline-block;
+    background:var(--sun);
+    border:3px dashed var(--ink);
+    border-radius:14px;
+    padding:12px 18px;
+    font-weight:700;
+    font-size:14px;
+    transform:rotate(-1deg);
+  }
+
+  /* ---------- CHECKLIST ---------- */
+  .section-title{
+    text-align:center;
+    margin-bottom:30px;
+    margin-top: 12px;
+  }
+  .section-title h2{ font-size:28px; }
+  .section-title p{ color:var(--ink-soft); font-weight:600; margin-top:6px;}
+  .checklist{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:16px;
+  }
+  .check-item{
+    background:var(--card);
+    border:3px solid var(--ink);
+    border-radius:16px;
+    padding:18px;
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+    cursor:pointer;
+    transition:transform .2s;
+    user-select:none;
+  }
+  .check-item:hover{ transform:translateY(-3px); }
+  .check-item.done{ background:#EFFBF5; }
+  .check-box{
+    width:26px;height:26px;
+    min-width:26px;
+    border:3px solid var(--ink);
+    border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:15px;
+    background:#fff;
+  }
+  .check-item.done .check-box{ background:var(--teal); color:#fff; }
+  .check-text b{ display:block; font-family:'Baloo 2',sans-serif; font-size:15px; margin-bottom:2px;}
+  .check-text span{ font-size:13px; color:var(--ink-soft); }
+
+  /* ---------- COLLAGE ---------- */
+  .collage-note{
+    background:#fff;
+    border:3px dashed var(--ink);
+    border-radius:18px;
+    padding:26px;
+    text-align:center;
+    color:var(--ink-soft);
+    font-weight:600;
+  }
+  .collage-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+    margin-top:18px;
+  }
+  .collage-cell{
+    aspect-ratio:1;
+    border-radius:14px;
+    border:3px solid var(--ink);
+    display:flex;align-items:center;justify-content:center;
+    font-size:26px;
+    color:#fff;
+    transform:rotate(var(--r,0deg));
+  }
+  .collage-cell:nth-child(1){ background:var(--coral); --r:-3deg;}
+  .collage-cell:nth-child(2){ background:var(--teal); --r:2deg;}
+  .collage-cell:nth-child(3){ background:var(--sun); --r:-2deg;}
+  .collage-cell:nth-child(4){ background:var(--ink); --r:1deg;}
+  .collage-cell:nth-child(5){ background:var(--coral-dark); --r:-1deg;}
+  .collage-cell:nth-child(6){ background:#3aa88f; --r:3deg;}
+
+  /* ---------- RSVP ---------- */
+  .rsvp{
+    text-align:center;
+  }
+  .rsvp h2{ font-size:30px; margin-bottom:8px; margin-top:16px;}
+  .rsvp p{ color:var(--ink-soft); font-weight:600; margin-bottom:26px;}
+  .rsvp-btns{
+    display:flex;
+    gap:16px;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
+  .btn{
+    font-family:'Baloo 2',sans-serif;
+    font-size:18px;
+    padding:16px 30px;
+    border-radius:100px;
+    border:3px solid var(--ink);
+    cursor:pointer;
+    transition:transform .15s;
+    font-weight:700;
+  }
+  .btn:active{ transform:scale(0.95); }
+  .btn-yes{ background:var(--teal); color:#fff; box-shadow:5px 5px 0 var(--ink);}
+  .btn-yes:hover{ transform:translateY(-3px); }
+  .btn-no{ background:#fff; color:var(--ink-soft); }
+  .rsvp-result{
+    margin-top:26px;
+    font-size:18px;
+    font-weight:700;
+    min-height:30px;
+    color:var(--coral-dark);
+  }
+
+  footer{
+    text-align:center;
+    padding:40px 24px 60px;
+    font-size:13px;
+    color:var(--ink-soft);
+    font-weight:600;
+  }
+
+  canvas#confetti{
+    position:fixed; inset:0; pointer-events:none; z-index:999;
+  }
+
+  @media (max-width:480px){
+    .cd-box{ width:64px; padding:10px 0;}
+    .cd-num{ font-size:24px;}
+    .collage-grid{ grid-template-columns:repeat(3,1fr); }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="confetti"></canvas>
+
+<span class="doodle" style="top:8%;left:6%;">🌿</span>
+<span class="doodle" style="top:14%;right:8%;animation-delay:1s;">🧺</span>
+<span class="doodle" style="top:60%;left:4%;animation-delay:2s;">🦋</span>
+<span class="doodle" style="top:70%;right:6%;animation-delay:1.5s;">☀️</span>
+
+<section class="hero">
+  <div class="eyebrow">СРОЧНОЕ ДЕЛО ОТ АЛЕКСЕЯ</div>
+  <div class="envelope-stage" id="envStage">
+    <div class="envelope" id="envelope">
+      <div class="env-flap"></div>
+      <div class="env-seal">💌</div>
+      <div class="env-body"></div>
+    </div>
+  </div>
+  <div class="hint-tap" id="hintTap">👆 нажми на конверт, там что-то важное</div>
+  <div class="reveal-box" id="revealBox">
+    Тссс. Это официально: годовщина скоро.
+    <br>
+    <button class="continue-btn" id="continueBtn">Читать дальше <span class="bounce-arrow">↓</span></button>
+  </div>
+</section>
+
+<section class="wrap" id="message">
+  <div class="msg-card">
+    <h2>Эвелина, у нас годовщина!</h2>
+    <p>Официальное расследование календаря сказало: мы всё ещё вместе(а как иначе), и это, честно говоря, я безумно рад этому</p>
+    <p>По случаю такой радости приглашаю тебя на мероприятие класса «выйти из дома и напрячь булки». Формат: ?. Локация: секрет уровня гос тайны. Просьба: У тифани не проси подсказки.</p>
+    <div class="signature">Твой Алексей Алекс Леша и просто котик️</div>
+  </div>
+</section>
+
+<section class="wrap countdown-wrap">
+  <h3>До операции «?» осталось:</h3>
+  <p class="countdown-sub">12 июля 2026 — обведи в календаре, поставь будильник, скажи рестикам что угодно</p>
+  <div class="countdown" id="countdown">
+    <div class="cd-box"><div class="cd-num" id="cd-days">--</div><div class="cd-label">дней</div></div>
+    <div class="cd-box"><div class="cd-num" id="cd-hours">--</div><div class="cd-label">часов</div></div>
+    <div class="cd-box"><div class="cd-num" id="cd-mins">--</div><div class="cd-label">минут</div></div>
+    <div class="cd-box"><div class="cd-num" id="cd-secs">--</div><div class="cd-label">секунд</div></div>
+  </div>
+  <div class="mystery-time">⏰ точное время явки объявлю утром. Секретность прежде всего.</div>
+</section>
+
+<section class="wrap">
+  <div class="section-title">
+    <h2>Что взять с собой (жми, чтобы отметить)</h2>
+    <p>Куда едем — military secret. А вот что понадобится — уже можно готовить</p>
+  </div>
+  <div class="checklist" id="checklist">
+    <div class="check-item" data-i="1"><div class="check-box"></div><div class="check-text"><b>Удобная обувь</b><span>Гулять придётся</span></div></div>
+    <div class="check-item" data-i="2"><div class="check-box"></div><div class="check-text"><b>Хорошее настроение</b><span>Обязательный пункт, без него нельзя</span></div></div>
+    <div class="check-item" data-i="3"><div class="check-box"></div><div class="check-text"><b>Что-то, что не жалко испачкать</b><span>Спасем твою одежду</span></div></div>
+    <div class="check-item" data-i="4"><div class="check-box"></div><div class="check-text"><b>Аппетит</b><span>Еды будет подозрительно много</span></div></div>
+    <div class="check-item" data-i="5"><div class="check-box"></div><div class="check-text"><b>Телефон для фото</b><span>Кадры для которых я буду стараться</span></div></div>
+    <div class="check-item" data-i="6"><div class="check-box"></div><div class="check-text"><b>Лёгкая кофта</b><span>На случай если к вечеру станет прохладно</span></div></div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="section-title">
+    <h2>Немного красоты</h2>
+    <p>Что я натрудился сделать за наши года</p>
+  </div>
+  <div class="collage-note">
+    Мои труды: 📸<br>
+  </div>
+  <div class="collage-grid">
+    <div class="collage-cell">
+      <img src="./1.jpg" style="width: 227px; height: 227px; border-radius: 8px"/>
+    </div>
+    <div class="collage-cell">
+      <img src="./2.jpg" style="width: 227px; height: 227px; border-radius: 8px"/>
+    </div>
+    <div class="collage-cell">
+      <img src="./3.jpg" style="width: 227px; height: 227px; border-radius: 8px"/>
+    </div>
+    <div class="collage-cell">
+      <img src="./4.jpg" style="width: 227px; height: 227px; border-radius: 8px"/>
+    </div>
+    <div class="collage-cell">
+      <img src="./5.jpg" style="width: 227px; height: 227px; border-radius: 8px"/>
+    </div>
+    <div class="collage-cell">
+      <img src="./6.jpg" style="width: 227px; height: 227px; border-radius: 8px"/>
+    </div>
+  </div>
+</section>
+
+<section class="wrap rsvp">
+  <h2>Ну что, готова?</h2>
+  <p>Выбери с достоинством один из двух правильных ответов</p>
+  <div class="rsvp-btns">
+    <button class="btn btn-yes" id="btnYes">Да, конечно! 🎉</button>
+    <button class="btn btn-no" id="btnNo">Мне нужно подумать ути пути мики пики 🤔</button>
+  </div>
+  <div class="rsvp-result" id="rsvpResult"></div>
+</section>
+
+<footer>сделано с любовью (и лёгкой паранойей о сохранении секретности локации)</footer>
+
+<script>
+  // Envelope open
+  const envelope = document.getElementById('envelope');
+  const hintTap = document.getElementById('hintTap');
+  const revealBox = document.getElementById('revealBox');
+  envelope.addEventListener('click', () => {
+    const opened = envelope.classList.toggle('opened');
+    hintTap.classList.toggle('hidden', opened);
+    revealBox.classList.toggle('show', opened);
+  });
+  document.getElementById('continueBtn').addEventListener('click', () => {
+    document.getElementById('message').scrollIntoView({behavior:'smooth', block:'start'});
+  });
+
+  // Countdown to 12 July 2026, exact hour withheld (kept as morning placeholder for internal calc only)
+  const target = new Date('2026-07-12T09:00:00');
+  function updateCountdown(){
+    const now = new Date();
+    let diff = target - now;
+    if(diff < 0) diff = 0;
+    const d = Math.floor(diff/(1000*60*60*24));
+    const h = Math.floor((diff/(1000*60*60))%24);
+    const m = Math.floor((diff/(1000*60))%60);
+    const s = Math.floor((diff/1000)%60);
+    document.getElementById('cd-days').textContent = d;
+    document.getElementById('cd-hours').textContent = String(h).padStart(2,'0');
+    document.getElementById('cd-mins').textContent = String(m).padStart(2,'0');
+    document.getElementById('cd-secs').textContent = String(s).padStart(2,'0');
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  // Checklist toggle
+  document.querySelectorAll('.check-item').forEach(item => {
+    item.addEventListener('click', () => {
+      item.classList.toggle('done');
+      const box = item.querySelector('.check-box');
+      box.textContent = item.classList.contains('done') ? '✓' : '';
+    });
+  });
+
+  // RSVP
+  const resultEl = document.getElementById('rsvpResult');
+  document.getElementById('btnYes').addEventListener('click', () => {
+    resultEl.textContent = 'Отлично! Заявка принята, паники по локации не будет 😌';
+    launchConfetti();
+  });
+  document.getElementById('btnNo').addEventListener('click', () => {
+    resultEl.textContent = 'Правильного ответа тут вообще-то два, и это не один из них 👀';
+  });
+
+  // Simple confetti
+  const canvas = document.getElementById('confetti');
+  const ctx = canvas.getContext('2d');
+  function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+  let particles = [];
+  function launchConfetti(){
+    const colors = ['#FF6F59','#06A77D','#FFC145','#2B2250'];
+    for(let i=0;i<140;i++){
+      particles.push({
+        x: canvas.width/2,
+        y: canvas.height/2,
+        vx: (Math.random()-0.5)*14,
+        vy: (Math.random()-1.3)*14,
+        size: Math.random()*8+4,
+        color: colors[Math.floor(Math.random()*colors.length)],
+        rot: Math.random()*360,
+        vrot: (Math.random()-0.5)*10,
+        life: 100
+      });
+    }
+    requestAnimationFrame(animateConfetti);
+  }
+  function animateConfetti(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.vy += 0.35; p.rot += p.vrot; p.life--;
+      ctx.save();
+      ctx.translate(p.x,p.y);
+      ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size*0.6);
+      ctx.restore();
+    });
+    particles = particles.filter(p => p.life > 0 && p.y < canvas.height+50);
+    if(particles.length>0) requestAnimationFrame(animateConfetti);
+  }
+</script>
+
+</body>
+</html>
